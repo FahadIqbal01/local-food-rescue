@@ -82,6 +82,21 @@ function Login() {
             Login
           </button>
         </form>
+
+        {/* Links */}
+        <div className="text-center mt-4">
+          <p className="text-gray-600">
+            Don’t have an account?{" "}
+            <a href="/register" className="text-green-700 hover:underline">
+              Register
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="#" className="text-sm text-blue-600 hover:underline">
+              Forgot password?
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
