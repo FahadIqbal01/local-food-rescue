@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../../components/Global/NavBar";
 
 function RecipientDashboard() {
   const [showHistory, setShowHistory] = useState(false);
@@ -17,26 +18,7 @@ function RecipientDashboard() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Navbar */}
-      <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Food Rescue - Recipient</h1>
-        <div className="space-x-6 flex items-center">
-          <a href="/recipient" className="hover:underline">
-            Dashboard
-          </a>
-          {/* <a href="/profile" className="hover:underline">
-            Profile
-          </a> */}
-          <button
-            onClick={() => setShowProfile(true)}
-            className="hover:underline cursor-pointer bg-transparent border-none"
-          >
-            Profile
-          </button>
-          <a href="/" className="hover:underline">
-            Logout
-          </a>
-        </div>
-      </nav>
+      <Navbar role="recipient" userName="XYZ" colorClass="bg-blue-600" />
 
       {/* Main Content: 3 Panels */}
       <div className="flex flex-grow bg-gray-100 p-6 gap-6">

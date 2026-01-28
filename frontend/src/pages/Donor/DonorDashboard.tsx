@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../../components/Global/NavBar";
 
 function DonorDashboard() {
   const [showAddDonation, setShowAddDonation] = useState(false);
@@ -36,25 +37,7 @@ function DonorDashboard() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Navbar */}
-      <nav className="bg-green-600 text-white px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Food Rescue - Donor</h1>
-        <div className="space-x-6 flex items-center">
-          {/* Navigation Links */}
-          <a href="/donor" className="hover:underline">
-            Dashboard
-          </a>
-          {/* Action Buttons (modals) */}
-          <button
-            onClick={() => setShowProfile(true)}
-            className="hover:underline cursor-pointer bg-transparent border-none"
-          >
-            Profile
-          </button>
-          <a href="/" className="hover:underline">
-            Logout
-          </a>
-        </div>
-      </nav>
+      <Navbar role="donor" userName="Fahad Iqbal" colorClass="bg-green-600" />
       {/* Main Content: 3 Panels */}
       <div className="flex flex-grow bg-gray-100 p-6 gap-6">
         {/* Left Panel: Summary */}

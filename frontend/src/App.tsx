@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import DonorDashboard from "./pages/Donor/DonorDashboard";
 import RecipientDashboard from "./pages/Recipient/RecipientDashboard";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ProfileSettings from "./pages/ProfileSettings";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/donor" element={<DonorDashboard />} />
         <Route path="/recipient" element={<RecipientDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/profile" element={<ProfileSettings role="recipient" />} />
       </Routes>
     </Router>
   );
