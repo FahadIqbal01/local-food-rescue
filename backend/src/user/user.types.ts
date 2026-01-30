@@ -9,4 +9,5 @@ export interface UserType extends Document {
   address: string[];
   status: string;
   isDeleted: boolean;
+  verificationToken?: string;
 }

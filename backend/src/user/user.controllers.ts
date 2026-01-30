@@ -3,7 +3,12 @@ import userModels from "./user.models";
 import {
   userSchemaValidator,
   userSchemaUpdateValidator,
+  userLoginValidator,
 } from "./user.validators";
+import { CompareHash, GenerateHash } from "../utils/hashing";
+import { SendVerificationEmail } from "../utils/emailHandler";
+import { VerificationEmail } from "../templates/emailVerificationTemplate";
+import { DecodeToken, GenerateToken } from "../utils/jsonWebToken";
 
 export async function CreateUser(request: Request, response: Response) {
   try {
@@ -27,12 +32,30 @@ export async function CreateUser(request: Request, response: Response) {
       });
     }
 
-    await userModels.create(data!);
+    const hashedPassword = await GenerateHash(data.password);
+    data.password = hashedPassword;
+
+    const newUser = await userModels.create(data);
+
+    const payload = {
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    };
+    const verificationToken: string = GenerateToken(payload);
+
+    await SendVerificationEmail(
+      "fahadiqbal9318@gmail.com",
+      "Welcome to Food Rescue!",
+      "Your account has been created successfully.",
+      VerificationEmail(newUser.name, newUser.role),
+    );
 
     return response.status(200).json({
       status: true,
       message: "User created.",
-      data: data,
+      data: newUser,
+      token: verificationToken,
     });
   } catch (err) {
     return response.status(400).json({
@@ -160,6 +183,111 @@ export async function DeleteUser(request: Request, response: Response) {
         message: "User deleted permanently.",
       });
     }
+  } catch (error) {
+    return response.status(400).json({
+      status: false,
+      message: error,
+    });
+  }
+}
+
+export async function VerifyUser(request: Request, response: Response) {
+  try {
+    const verificationToken: string | undefined =
+      request.headers.authorization?.split(" ")[1];
+    if (!verificationToken)
+      return response.status(200).json({
+        status: true,
+        message: "Token not found.",
+      });
+
+    const decodedPayload: any = DecodeToken(verificationToken);
+
+    const existingUser = await userModels.findOne({
+      email: decodedPayload.payload?.email,
+    });
+    if (!existingUser) {
+      return response.status(400).json({
+        status: true,
+        message: "User not found.",
+      });
+    }
+
+    if (existingUser.status === "active") {
+      return response.status(200).json({
+        status: true,
+        message: "User already verified.",
+      });
+    }
+
+    existingUser.status = "active";
+    existingUser.verificationToken = "";
+
+    await existingUser.save();
+
+    return response.status(200).json({
+      status: true,
+      token: verificationToken,
+      decode: DecodeToken(verificationToken).payload,
+      verified: existingUser.status,
+    });
+  } catch (error) {
+    return response.status(400).json({
+      status: "false",
+      message: error,
+    });
+  }
+}
+
+export async function LoginUser(request: Request, response: Response) {
+  try {
+    const { data, success, error } = userLoginValidator.safeParse(request.body);
+    if (!success) {
+      return response.status(400).json({
+        status: false,
+        message: error.issues.map((issue) => issue.message),
+      });
+    }
+
+    const existingUser = await userModels.findOne({ email: data.email });
+    if (!existingUser) {
+      return response.status(400).json({
+        status: false,
+        message: "User not found.",
+      });
+    }
+
+    const isSuccessfulLogin: boolean = await CompareHash(
+      data.password,
+      existingUser.password,
+    );
+    if (!isSuccessfulLogin) {
+      return response.status(400).json({
+        status: false,
+        message: "Invalid Credentials.",
+      });
+    }
+
+    const payload = {
+      name: existingUser.name,
+      email: existingUser.email,
+      role: existingUser.role,
+    };
+
+    const accessToken: string = GenerateToken(payload);
+
+    return response.status(200).json({
+      status: true,
+      message: "User logged in successfully.",
+      data: request.body,
+      compareCredentials: (await CompareHash(
+        data.password,
+        existingUser.password,
+      ))
+        ? "Login success"
+        : "Login Failed",
+      accessToken: accessToken,
+    });
   } catch (error) {
     return response.status(400).json({
       status: false,
