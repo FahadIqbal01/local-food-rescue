@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import { VerificationEmail } from "../templates/emailVerificationTemplate";
 
 export async function SendVerificationEmail(
   to: string,
