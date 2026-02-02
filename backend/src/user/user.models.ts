@@ -21,8 +21,12 @@ const userSchema = new mongoose.Schema<UserType>(
       required: true,
     }, // "donor"|"recipient"|"admin"
     phoneNumber: { type: String, length: 11 },
-    address: [{ type: String, required: true }],
-    status: { type: String, enum: ["active", "inactive", "banned"] }, // "active"|"inactive"|"banned"
+    address: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "banned"],
+      default: "inactive",
+    }, // "active"|"inactive"|"banned"
     isDeleted: { type: Boolean, default: false },
     verificationToken: { type: String, default: null },
   },

@@ -1,30 +1,51 @@
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {},
-  );
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: { email?: string; password?: string } = {};
-    // Email validation
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Invalid email format";
-    }
-    // Password validation
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    setErrors(newErrors);
-    // If no errors, proceed (e.g., call API)
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Form submitted:", { email, password });
+
+    const loginRequestBody = {
+      email,
+      password,
+    };
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:3001/api/user/login",
+        loginRequestBody,
+      );
+
+      console.log(response.data.user);
+      if (response.data.status) {
+        const token: string = response.data.token;
+        const role: string = response.data.user.role;
+
+        // Save token for later requests
+        localStorage.setItem("authToken", token);
+
+        // Redirect based on role
+        if (role === "donor") {
+          navigate("/donor");
+        } else if (role === "recipient") {
+          navigate("/recipient");
+        } else if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+
+        alert("User logged in successfully.");
+      } else {
+        alert("Error: " + response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong.");
     }
   };
 
@@ -44,15 +65,8 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 ${
-                errors.email
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-green-600"
-              }`}
+              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-            )}
           </div>
 
           {/* Password */}
@@ -63,15 +77,8 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 ${
-                errors.password
-                  ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-green-600"
-              }`}
+              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
             />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-            )}
           </div>
 
           {/* Submit Button */}

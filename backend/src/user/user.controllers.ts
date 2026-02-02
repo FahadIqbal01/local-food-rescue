@@ -43,12 +43,13 @@ export async function CreateUser(request: Request, response: Response) {
       role: newUser.role,
     };
     const verificationToken: string = GenerateToken(payload);
+    const verificationLink: string = `http://localhost:3000/verify?token=${verificationToken}`;
 
     await SendVerificationEmail(
       "fahadiqbal9318@gmail.com",
       "Welcome to Food Rescue!",
       "Your account has been created successfully.",
-      VerificationEmail(newUser.name, newUser.role),
+      VerificationEmail(newUser.name, newUser.role, verificationLink),
     );
 
     return response.status(200).json({
@@ -269,6 +270,7 @@ export async function LoginUser(request: Request, response: Response) {
     }
 
     const payload = {
+      id: existingUser._id,
       name: existingUser.name,
       email: existingUser.email,
       role: existingUser.role,
@@ -279,14 +281,13 @@ export async function LoginUser(request: Request, response: Response) {
     return response.status(200).json({
       status: true,
       message: "User logged in successfully.",
-      data: request.body,
-      compareCredentials: (await CompareHash(
-        data.password,
-        existingUser.password,
-      ))
-        ? "Login success"
-        : "Login Failed",
-      accessToken: accessToken,
+      user: {
+        id: existingUser._id,
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role,
+      },
+      token: accessToken,
     });
   } catch (error) {
     return response.status(400).json({

@@ -18,8 +18,8 @@ export const userSchemaValidator = zod.object({
     .nonempty(),
   role: zod.enum(["donor", "recipient", "admin"]),
   phoneNumber: zod.string().nonempty().length(11),
-  address: zod.array(zod.string()),
-  status: zod.enum(["active", "inactive", "banned"]),
+  address: zod.string(),
+  status: zod.enum(["active", "inactive", "banned"]).default("inactive"),
   isDeleted: zod.boolean().default(false),
   verificationToken: zod.string().default(""),
 });

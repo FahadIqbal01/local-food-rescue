@@ -1,4 +1,8 @@
-export function VerificationEmail(userName: string, userRole: string): string {
+export function VerificationEmail(
+  userName: string,
+  userRole: string,
+  verificationLink: string,
+): string {
   let userMessage: string = "";
   switch (userRole) {
     case "donor":
@@ -40,7 +44,7 @@ export function VerificationEmail(userName: string, userRole: string): string {
                     <p style="margin:0 0 15px;">${userMessage}</p>
                     <p style="margin:0 0 20px;">You can now log in to your dashboard and start exploring.</p>
                     <p style="text-align:center;">
-                        <a href="https://foodrescue.com/login" 
+                        <a href=${verificationLink} 
                         style="display:inline-block; padding:12px 24px; background:#2d6a4f; color:#ffffff; text-decoration:none; border-radius:4px; font-weight:bold;">
                         Verify Account
                         </a>

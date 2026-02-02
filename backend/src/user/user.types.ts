@@ -6,7 +6,7 @@ export interface UserType extends Document {
   password: string;
   role: string;
   phoneNumber: string;
-  address: string[];
+  address: string;
   status: string;
   isDeleted: boolean;
   verificationToken?: string;
