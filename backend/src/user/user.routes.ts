@@ -8,6 +8,7 @@ import {
   DeleteUser,
   LoginUser,
   VerifyUser,
+  GetProfile,
 } from "./user.controllers";
 import { CheckJWT } from "../middlewares/checkJWToken";
 import { AuthorizeUser } from "../middlewares/authorizeUser";
@@ -16,6 +17,7 @@ const userRouter = Router();
 
 userRouter.post("/post", CreateUser);
 userRouter.get("/get", CheckJWT, AuthorizeUser(["admin"]), GetAllUsers);
+userRouter.get("/get/data", CheckJWT, GetProfile);
 userRouter.get("/get/:id", GetUserById);
 userRouter.patch(
   "/patch/:id",

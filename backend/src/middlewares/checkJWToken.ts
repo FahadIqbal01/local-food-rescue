@@ -20,6 +20,8 @@ export function CheckJWT(
     const decodedPayload = DecodeToken(accessToken);
     request.user = decodedPayload.payload;
 
+    // console.log("User\n", request.user);
+
     next();
   } catch (error) {
     return response.status(400).json({

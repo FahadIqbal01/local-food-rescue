@@ -9,6 +9,7 @@ import { CompareHash, GenerateHash } from "../utils/hashing";
 import { SendVerificationEmail } from "../utils/emailHandler";
 import { VerificationEmail } from "../templates/emailVerificationTemplate";
 import { DecodeToken, GenerateToken } from "../utils/jsonWebToken";
+import { AuthenticatedRequest } from "../@types/authenticatedRequest";
 
 export async function CreateUser(request: Request, response: Response) {
   try {
@@ -288,6 +289,24 @@ export async function LoginUser(request: Request, response: Response) {
         role: existingUser.role,
       },
       token: accessToken,
+    });
+  } catch (error) {
+    return response.status(400).json({
+      status: false,
+      message: error,
+    });
+  }
+}
+
+export async function GetProfile(
+  request: AuthenticatedRequest,
+  response: Response,
+) {
+  try {
+    const user = request.user;
+    return response.status(200).json({
+      status: true,
+      user: user,
     });
   } catch (error) {
     return response.status(400).json({

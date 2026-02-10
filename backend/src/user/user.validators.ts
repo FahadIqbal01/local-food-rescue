@@ -22,6 +22,7 @@ export const userSchemaValidator = zod.object({
   status: zod.enum(["active", "inactive", "banned"]).default("inactive"),
   isDeleted: zod.boolean().default(false),
   verificationToken: zod.string().default(""),
+  resetCredentialsToken: zod.string().default(""),
 });
 
 export const userSchemaUpdateValidator = userSchemaValidator.partial();

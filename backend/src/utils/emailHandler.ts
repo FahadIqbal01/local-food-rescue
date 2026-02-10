@@ -31,3 +31,33 @@ export async function SendVerificationEmail(
     console.error("Error in sending email: ", error);
   }
 }
+
+export async function SendEmailForResetCredentials(
+  to: string,
+  subject: string,
+  text?: string,
+  html?: string,
+) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: to,
+      subject: subject,
+      text: text,
+      html: html,
+    };
+
+    const emailPromise = await transporter.sendMail(mailOptions);
+    console.log("Email sent for reset credentials: ", emailPromise.response);
+  } catch (error) {
+    console.error("Error in sending email: ", error);
+  }
+}

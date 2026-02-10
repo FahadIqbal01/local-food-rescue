@@ -1,22 +1,51 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
-  role: "donor" | "recipient" | "admin";
-  userName: string;
+  role?: "donor" | "recipient" | "admin";
+  userName?: string;
   colorClass: string;
 }
 
-export default function Navbar({ role, userName, colorClass }: NavbarProps) {
+export default function Navbar({ colorClass }: NavbarProps) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      axios
+        .get("http://127.0.0.1:3001/api/user/get/data", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          setUserName(res.data.user.name);
+          setUserRole(res.data.user.role);
+        })
+        .catch((err) => {
+          console.error("Error fetching profile:", err);
+        });
+    }
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("donorID");
+    localStorage.clear();
+  }
   return (
     <nav
       className={`w-full ${colorClass} text-white px-6 py-3 flex justify-between items-center`}
     >
       {/* Left: Logo */}
       <div className="text-xl font-bold">
-        <Link to="/">Food Rescue</Link>
+        <Link to="/">
+          Food Rescue - Welcome to{" "}
+          {userRole && userRole?.charAt(0).toUpperCase() + userRole?.slice(1)}
+        </Link>
       </div>
 
       {/* Right: Avatar Dropdown */}
@@ -54,7 +83,7 @@ export default function Navbar({ role, userName, colorClass }: NavbarProps) {
                 My Claims
               </Link>
             )} */}
-            {role === "admin" && (
+            {/* {userRole === "admin" && (
               <>
                 <Link
                   to="/admin-dashboard/donors"
@@ -78,7 +107,7 @@ export default function Navbar({ role, userName, colorClass }: NavbarProps) {
                   Manage Donations
                 </Link>
               </>
-            )}
+            )} */}
 
             {/* Common links */}
             {/* <Link
@@ -88,18 +117,20 @@ export default function Navbar({ role, userName, colorClass }: NavbarProps) {
             >
               Impact Analytics
             </Link> */}
-            <Link
+            {/* <Link
               to="/profile"
               className="block px-4 py-2 hover:bg-purple-100"
               onClick={() => setMenuOpen(false)}
             >
               Profile / Settings
-            </Link>
+            </Link> */}
             <button
               className="w-full text-left px-4 py-2 hover:bg-purple-100"
               onClick={() => {
                 setMenuOpen(false);
+                handleLogout();
                 // handle logout logic here
+                navigate("/login");
               }}
             >
               Logout

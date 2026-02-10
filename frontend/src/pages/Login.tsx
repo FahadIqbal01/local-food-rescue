@@ -7,7 +7,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const loginRequestBody = {
@@ -27,6 +27,9 @@ function Login() {
 
         // Save token for later requests
         localStorage.setItem("authToken", token);
+        localStorage.setItem("donorID", response.data.user.id);
+        console.log(localStorage.getItem("authToken"));
+        console.log(localStorage.getItem("donorID"));
 
         // Redirect based on role
         if (role === "donor") {
@@ -47,7 +50,7 @@ function Login() {
       console.error(error);
       alert("Something went wrong.");
     }
-  };
+  }
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -99,9 +102,12 @@ function Login() {
             </a>
           </p>
           <p className="mt-2">
-            <a href="#" className="text-sm text-blue-600 hover:underline">
+            <button
+              onClick={() => navigate("forgot-password")}
+              className="text-sm text-blue-600 hover:underline"
+            >
               Forgot password?
-            </a>
+            </button>
           </p>
         </div>
       </div>

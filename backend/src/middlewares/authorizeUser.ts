@@ -14,6 +14,8 @@ export function AuthorizeUser(roles: string[]) {
       });
     }
 
+    // console.log("Roles: ", roles);
+    // console.log("Role: ", request.user.role);
     if (!roles.includes(request.user.role)) {
       return response.status(403).json({
         status: false,

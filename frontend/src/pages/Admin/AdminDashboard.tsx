@@ -1,114 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/Global/NavBar";
+import axios from "axios";
+import EmptyStateMessage from "../../components/EmptyStateMessage";
+import EditModal from "../../modals/EditModal";
+import DeleteModal from "../../modals/DeleteModal";
+import { useNavigate } from "react-router-dom";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
-  const donors = [
-    { id: 1, name: "Bakery A", donations: 12, email: "bakeryA@email.com" },
-    { id: 2, name: "Store B", donations: 8, email: "storeB@email.com" },
-  ];
-
-  const recipients = [
-    { id: 1, name: "Charity X", claimed: 20, email: "charity@email.com" },
-    { id: 2, name: "NGO Y", claimed: 15, email: "ngo@email.com" },
-  ];
-
-  const donorsDonations = [
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-    { id: 1, item: "Rice Bags", quantity: 10, status: "Pending" },
-    { id: 2, item: "Milk Cartons", quantity: 30, status: "Delivered" },
-  ];
-
-  const recipientClaims = [
-    {
-      donationId: 1,
-      recipient: "Charity House",
-      item: "Milk Cartons",
-      quantity: 25,
-      status: "Received",
-    },
-    {
-      donationId: 1,
-      recipient: "Food Bank",
-      item: "Vegetables",
-      quantity: 15,
-      status: "Pending",
-    },
-    {
-      donationId: 2,
-      recipient: "Community Center",
-      item: "Bread Loaves",
-      quantity: 30,
-      status: "Received",
-    },
-    {
-      donationId: 1,
-      recipient: "Charity House",
-      item: "Milk Cartons",
-      quantity: 25,
-      status: "Received",
-    },
-    {
-      donationId: 1,
-      recipient: "Food Bank",
-      item: "Vegetables",
-      quantity: 15,
-      status: "Pending",
-    },
-    {
-      donationId: 2,
-      recipient: "Community Center",
-      item: "Bread Loaves",
-      quantity: 30,
-      status: "Received",
-    },
-    {
-      donationId: 1,
-      recipient: "Charity House",
-      item: "Milk Cartons",
-      quantity: 25,
-      status: "Received",
-    },
-    {
-      donationId: 1,
-      recipient: "Food Bank",
-      item: "Vegetables",
-      quantity: 15,
-      status: "Pending",
-    },
-    {
-      donationId: 2,
-      recipient: "Community Center",
-      item: "Bread Loaves",
-      quantity: 30,
-      status: "Received",
-    },
-  ];
 
   // States for middle panel's tables.
   const [activeTab, setActiveTab] = useState<
@@ -120,6 +21,7 @@ function AdminDashboard() {
   const [donorTab, setDonorTab] = useState<
     "profile" | "donations" | "activity"
   >("profile");
+  const [donorsDonations, setDonorsDonations] = useState<Donation[]>([]);
 
   // States for tabs in Recipient's Modal.
   const [selectedRecipient, setSelectedRecipient] = useState<any>(null);
@@ -127,38 +29,132 @@ function AdminDashboard() {
     "profile" | "claims" | "activity"
   >("profile");
 
-  // Donor Donations Pagination
-  const [donorCurrentPage, setDonorCurrentPage] = useState(1);
-  const donationsPerPage: number = 7;
-  const totalPages: number = Math.ceil(
-    donorsDonations.length / donationsPerPage,
-  );
-
-  // Recipient Claims Pagination
-  const [recipientCurrentPage, setRecipientCurrentPage] = useState(1);
-  const recipientClaimsPerPage: number = 5; // adjust as needed
-  const recipientTotalPages: number = Math.ceil(
-    recipientClaims.length / recipientClaimsPerPage,
-  );
-
-  // Middle Panel Donations Pagination
-  const [middleCurrentPage, setMiddleCurrentPage] = useState(1);
-  const middleDonationsPerPage: number = 8; // adjust as needed
-  const middleTotalPages: number = Math.ceil(
-    donorsDonations.length / middleDonationsPerPage,
-  );
-
   // State for Selected Donation
   const [selectedDonation, setSelectedDonation] = useState<any>(null);
   const [donationTab, setDonationTab] = useState<
     "details" | "activity" | "claims"
   >("details");
+  const [editDonation, setEditDonation] = useState(false);
+  const [deleteDonation, setDeleteDonation] = useState(false);
+  const [detailDonation, setDetailDonation] = useState(false);
 
-  // Donation Claims Pagination
-  const [claimsCurrentPage, setClaimsCurrentPage] = useState(1);
-  const claimsPerPage = 5; // adjust as needed
-  const claimsTotalPages = Math.ceil(recipientClaims.length / claimsPerPage);
+  type Donation = {
+    _id: string;
+    donorID?: string;
+    foodType: string;
+    quantity: number;
+    pickupAddress: string;
+    status: "pending" | "available" | "completed" | "expired";
+    expiryDate?: string;
+    notes?: string;
+  };
+  type User = {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+    phoneNumber: string;
+    address: string;
+    status: "active" | "inactive" | "banned";
+  };
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [totalDonations, setTotalDonations] = useState<number>(0);
+  const [donors, setDonors] = useState<User[]>([]);
+  const [totalDonors, setTotalDonors] = useState<number>(0);
+  const [recipients, setRecipients] = useState<User[]>([]);
+  const [totalRecipients, setTotalRecipients] = useState<number>(0);
 
+  // Pagination states
+  const [limit] = useState<number>(8);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  useEffect(() => {
+    async function getAllDonations() {
+      const token = localStorage.getItem("authToken");
+      try {
+        const stats = await axios.get(
+          "http://127.0.0.1:3001/api/admin/get/stats",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        if (stats.data.status) {
+          setTotalDonors(stats.data.totalDonors || 0);
+          setTotalRecipients(stats.data.totalRecipients || 0);
+        }
+
+        if (activeTab === "donations") {
+          const response = await axios.get(
+            "http://127.0.0.1:3001/api/admin/get/donation",
+            {
+              params: { limit, page },
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+
+          if (response.data.status) {
+            setDonations(response.data.allDonations || []);
+            setTotalPages(Math.ceil(response.data.total / limit));
+            setTotalDonations(response.data.total);
+          }
+        } else if (activeTab === "donors") {
+          const allDonors = await axios.get(
+            "http://127.0.0.1:3001/api/admin/get/donors",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          if (allDonors.data.status) {
+            // console.log(allDonors.data);
+            setDonors(allDonors.data.allDonors || []);
+            setTotalPages(Math.ceil(allDonors.data.total / limit));
+          }
+        } else if (activeTab === "recipients") {
+          const recipients = await axios.get(
+            "http://127.0.0.1:3001/api/admin/get/recipients",
+            {
+              params: {
+                limit,
+                page,
+              },
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+
+          if (recipients.data.status) {
+            setRecipients(recipients.data.allRecipients || []);
+            setTotalPages(Math.ceil(recipients.data.total / limit));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching donations:", error);
+      }
+    }
+    getAllDonations();
+  }, [page, limit, activeTab]);
+
+  function handleUpdateDonation(updatedDonation: any) {
+    setDonations((prevDonations) =>
+      prevDonations.map((donation) =>
+        donation._id === updatedDonation._id ? updatedDonation : donation,
+      ),
+    );
+  }
+
+  async function handleDeleteDonation(id: string) {
+    try {
+      await axios.delete(`http://127.0.0.1:3001/api/donation/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      setDonations((prev) => prev.filter((donation) => donation._id !== id));
+      setDetailDonation(false);
+    } catch (error) {
+      console.error("Error deleting donation:", error);
+    }
+  }
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Navbar */}
@@ -167,34 +163,38 @@ function AdminDashboard() {
       {/* Main Content: 3 Panels */}
       <div className="flex flex-grow bg-gray-100 p-6 gap-6">
         {/* Left Panel: Summary */}
-        <div className="w-1/4 space-y-4">
+        <div className="w-1/6 space-y-4">
           <div className="bg-green-100 p-4 rounded shadow">
             <h2 className="text-lg font-semibold text-green-800">
               Total Donors
             </h2>
-            <p className="text-2xl font-bold">{donors.length}</p>
+            <p className="text-2xl font-bold">{totalDonors}</p>
           </div>
           <div className="bg-blue-100 p-4 rounded shadow">
             <h2 className="text-lg font-semibold text-blue-800">
               Total Recipients
             </h2>
-            <p className="text-2xl font-bold">{recipients.length}</p>
+            <p className="text-2xl font-bold">{totalRecipients}</p>
           </div>
           <div className="bg-yellow-100 p-4 rounded shadow">
             <h2 className="text-lg font-semibold text-yellow-800">
               Total Donations
             </h2>
-            <p className="text-2xl font-bold">{donorsDonations.length}</p>
+            <p className="text-2xl font-bold">{totalDonations}</p>
           </div>
         </div>
 
         {/* Middle Panel: Management */}
         {/* ---------------- Middle Panel: Management ---------------- */}
-        <div className="w-2/4 bg-white rounded shadow p-4 flex flex-col">
+        <div className="w-4/6 bg-white rounded shadow p-4 flex flex-col">
           {/* Tabs */}
           <div className="flex space-x-4 mb-4">
             <button
-              onClick={() => setActiveTab("donations")}
+              onClick={() => {
+                setActiveTab("donations");
+                setPage(1);
+                setTotalPages(1);
+              }}
               className={`px-4 py-2 rounded ${
                 activeTab === "donations"
                   ? "bg-purple-600 text-white"
@@ -204,7 +204,11 @@ function AdminDashboard() {
               Donations
             </button>
             <button
-              onClick={() => setActiveTab("donors")}
+              onClick={() => {
+                setActiveTab("donors");
+                setPage(1);
+                setTotalPages(1);
+              }}
               className={`px-4 py-2 rounded ${
                 activeTab === "donors"
                   ? "bg-purple-600 text-white"
@@ -214,7 +218,11 @@ function AdminDashboard() {
               Donors
             </button>
             <button
-              onClick={() => setActiveTab("recipients")}
+              onClick={() => {
+                setActiveTab("recipients");
+                setPage(1);
+                setTotalPages(1);
+              }}
               className={`px-4 py-2 rounded ${
                 activeTab === "recipients"
                   ? "bg-purple-600 text-white"
@@ -227,70 +235,124 @@ function AdminDashboard() {
 
           {/* Donors Table */}
           {activeTab === "donors" && (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-200 text-left">
-                  <th className="p-2">Name</th>
-                  <th className="p-2">Email</th>
-                  <th className="p-2">Total Donations</th>
-                  <th className="p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {donors.map((donor) => (
-                  <tr key={donor.id} className="border-b">
-                    <td className="p-2">{donor.name}</td>
-                    <td className="p-2">{donor.email}</td>
-                    <td className="p-2">{donor.donations}</td>
-                    <td className="p-2">
-                      <button
-                        onClick={() => {
-                          setSelectedDonor(donor);
-                          setDonorTab("profile");
-                        }}
-                        className="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="flex flex-col flex-grow">
+              <div className="flex-grow overflow-y-auto min-h-[300px]">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-200 text-left">
+                      <th className="p-2">Donor ID</th>
+                      <th className="p-2">Name</th>
+                      <th className="p-2">Email</th>
+                      <th className="p-2">Status</th>
+                      <th className="p-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {donors.length === 0 ? (
+                      <EmptyStateMessage message="No donors available." />
+                    ) : (
+                      donors.map((donor) => (
+                        <tr key={donor._id} className="border-b">
+                          <td className="p-2">{donor._id}</td>
+                          <td className="p-2">{donor.name}</td>
+                          <td className="p-2">{donor.email}</td>
+                          <td className="p-2">
+                            {
+                              <span
+                                className={`px-2 py-1 rounded text-sm ${
+                                  donor.status === "active"
+                                    ? "bg-green-100 text-green-700"
+                                    : donor.status === "inactive"
+                                      ? "bg-yellow-100 text-yellow-700"
+                                      : donor.status === "banned"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {donor.status}
+                              </span>
+                            }
+                          </td>
+                          <td className="p-2">
+                            <button
+                              onClick={() => {
+                                setSelectedDonor(donor);
+                                setDonorTab("profile");
+                                navigate(`/admin/donors/${donor._id}`);
+                              }}
+                              className="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
           {/* Recipients Table */}
           {activeTab === "recipients" && (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-200 text-left">
-                  <th className="p-2">Name</th>
-                  <th className="p-2">Email</th>
-                  <th className="p-2">Total Claimed</th>
-                  <th className="p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recipients.map((recipient) => (
-                  <tr key={recipient.id} className="border-b">
-                    <td className="p-2">{recipient.name}</td>
-                    <td className="p-2">{recipient.email}</td>
-                    <td className="p-2">{recipient.claimed}</td>
-                    <td className="p-2">
-                      <button
-                        onClick={() => {
-                          setSelectedRecipient(recipient);
-                          setRecipientTab("profile");
-                        }}
-                        className="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="flex flex-col flex-grow">
+              <div className="flex-grow overflow-y-auto min-h-[300px]">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-200 text-left">
+                      <th className="p-2">Recipient ID</th>
+                      <th className="p-2">Name</th>
+                      <th className="p-2">Email</th>
+                      <th className="p-2">Status</th>
+                      <th className="p-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recipients.length === 0 ? (
+                      <EmptyStateMessage message="No recipients available." />
+                    ) : (
+                      recipients.map((recipient) => (
+                        <tr key={recipient._id} className="border-b">
+                          <td className="p-2">{recipient._id}</td>
+                          <td className="p-2">{recipient.name}</td>
+                          <td className="p-2">{recipient.email}</td>
+                          <td className="p-2">
+                            {
+                              <span
+                                className={`px-2 py-1 rounded text-sm ${
+                                  recipient.status === "active"
+                                    ? "bg-green-100 text-green-700"
+                                    : recipient.status === "inactive"
+                                      ? "bg-yellow-100 text-yellow-700"
+                                      : recipient.status === "banned"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {recipient.status}
+                              </span>
+                            }
+                          </td>
+                          <td className="p-2">
+                            <button
+                              onClick={() => {
+                                setSelectedRecipient(recipient);
+                                setRecipientTab("profile");
+                                navigate(`/admin/recipients/${recipient._id}`);
+                              }}
+                              className="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
           {/* Donations Table */}
@@ -308,21 +370,23 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {donorsDonations
-                      .slice(
-                        (middleCurrentPage - 1) * middleDonationsPerPage,
-                        middleCurrentPage * middleDonationsPerPage,
-                      )
-                      .map((donation) => (
-                        <tr key={donation.id} className="border-b">
-                          <td className="p-2">{donation.item}</td>
+                    {donations.length === 0 ? (
+                      <EmptyStateMessage message="No donations available." />
+                    ) : (
+                      donations.map((donation) => (
+                        <tr key={donation._id} className="border-b">
+                          <td className="p-2">{donation.foodType}</td>
                           <td className="p-2">{donation.quantity}</td>
                           <td className="p-2">
                             <span
-                              className={`px-2 py-1 rounded-full text-sm font-semibold ${
-                                donation.status === "Delivered"
-                                  ? "bg-green-200 text-green-800"
-                                  : "bg-yellow-200 text-yellow-800"
+                              className={`px-2 py-1 rounded text-sm ${
+                                donation.status === "available"
+                                  ? "bg-green-100 text-green-700"
+                                  : donation.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : donation.status === "completed"
+                                      ? "bg-blue-100 text-blue-700"
+                                      : "bg-red-100 text-red-700"
                               }`}
                             >
                               {donation.status}
@@ -332,62 +396,73 @@ function AdminDashboard() {
                             <button
                               onClick={() => {
                                 setSelectedDonation(donation);
+                                setDetailDonation(true);
                                 setDonationTab("details"); // default tab
                               }}
                               className="px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
                             >
                               View
                             </button>
-
-                            <button className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                            <button
+                              onClick={() => {
+                                setSelectedDonation(donation);
+                                setEditDonation(true);
+                              }}
+                              className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                            >
                               Edit
                             </button>
-                            <button className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+                            <button
+                              onClick={() => {
+                                setSelectedDonation(donation);
+                                setDeleteDonation(true);
+                              }}
+                              className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                            >
                               Delete
                             </button>
                           </td>
                         </tr>
-                      ))}
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-
-              {/* Pagination fixed at bottom */}
-              <div className="flex justify-between items-center mt-4">
-                <button
-                  disabled={middleCurrentPage === 1}
-                  onClick={() =>
-                    setMiddleCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <span className="text-gray-600">
-                  Page {middleCurrentPage} of {middleTotalPages}
-                </span>
-                <button
-                  disabled={middleCurrentPage === middleTotalPages}
-                  onClick={() =>
-                    setMiddleCurrentPage((prev) =>
-                      Math.min(prev + 1, middleTotalPages),
-                    )
-                  }
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
             </div>
           )}
+
+          {/* Pagination fixed at bottom */}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              disabled={page === 1}
+              onClick={() => {
+                setPage(page - 1);
+              }}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-gray-600">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              disabled={page === totalPages}
+              onClick={() => {
+                setPage(page + 1);
+              }}
+              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
 
         {/* Right Panel: Analytics */}
-        <div className="w-1/4 bg-white rounded shadow p-4 flex flex-col">
+        <div className="w-1/6 bg-white rounded shadow p-4 flex flex-col">
           <h2 className="text-xl font-bold mb-4">Impact Analytics</h2>
           <div className="flex-grow space-y-2">
-            <p className="text-gray-700">Meals Rescued: 215</p>
-            <p className="text-gray-700">Active Listings: 12</p>
+            <p className="text-gray-700">Meals Rescued: {215}</p>
+            <p className="text-gray-700">Active Listings: {12}</p>
           </div>
           <button
             onClick={() => setShowAnalytics(true)}
@@ -470,7 +545,10 @@ function AdminDashboard() {
           <div className="relative bg-white rounded-xl shadow-2xl p-8 w-3/4 h-[80vh] flex flex-col">
             {/* Close Button */}
             <button
-              onClick={() => setSelectedDonor(null)}
+              onClick={() => {
+                setSelectedDonor(null);
+                setDonorsDonations([]);
+              }}
               className="absolute top-8 right-8 text-gray-600 hover:text-black font-bold text-xl"
             >
               ✕
@@ -513,12 +591,16 @@ function AdminDashboard() {
                       <span className="font-semibold">Email:</span>{" "}
                       {selectedDonor.email}
                     </p>
+                    <p>
+                      <span className="font-semibold">Donor ID:</span>{" "}
+                      {selectedDonor._id}
+                    </p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg shadow-sm">
                     <p>
                       <span className="font-semibold">Total Donations:</span>
                       <span className="ml-2 px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm font-bold">
-                        {selectedDonor.donations}
+                        {donations.length}
                       </span>
                     </p>
                   </div>
@@ -538,28 +620,27 @@ function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {donorsDonations
-                          .slice(
-                            (donorCurrentPage - 1) * donationsPerPage,
-                            donorCurrentPage * donationsPerPage,
-                          )
-                          .map((donation, idx) => (
-                            <tr key={idx} className="border-b">
-                              <td className="p-2">{donation.item}</td>
-                              <td className="p-2">{donation.quantity}</td>
-                              <td className="p-2">
-                                <span
-                                  className={`px-2 py-1 rounded-full text-sm font-semibold ${
-                                    donation.status === "Delivered"
-                                      ? "bg-green-200 text-green-800"
-                                      : "bg-yellow-200 text-yellow-800"
-                                  }`}
-                                >
-                                  {donation.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                        {donorsDonations.map((donation) => (
+                          <tr key={donation._id} className="border-b">
+                            <td className="p-2">{donation.foodType}</td>
+                            <td className="p-2">{donation.quantity}</td>
+                            <td className="p-2">
+                              <span
+                                className={`px-2 py-1 rounded-full text-sm font-semibold ${
+                                  donation.status === "available"
+                                    ? "bg-green-100 text-green-700"
+                                    : donation.status === "completed"
+                                      ? "bg-yellow-100 text-yellow-700"
+                                      : donation.status === "expired"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-red-100 text-red-700"
+                                }`}
+                              >
+                                {donation.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -567,24 +648,22 @@ function AdminDashboard() {
                   {/* Pagination fixed at bottom */}
                   <div className="flex justify-between items-center mt-4">
                     <button
-                      disabled={donorCurrentPage === 1}
-                      onClick={() =>
-                        setDonorCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
+                      disabled={page === 1}
+                      onClick={() => {
+                        setPage(page - 1);
+                      }}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <span className="text-gray-600">
-                      Page {donorCurrentPage} of {totalPages}
+                      Page {page} of {totalPages}
                     </span>
                     <button
-                      disabled={donorCurrentPage === totalPages}
-                      onClick={() =>
-                        setDonorCurrentPage((prev) =>
-                          Math.min(prev + 1, totalPages),
-                        )
-                      }
+                      disabled={page === totalPages}
+                      onClick={() => {
+                        setPage(page + 1);
+                      }}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
                       Next
@@ -684,7 +763,7 @@ function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {recipientClaims
+                        {/* {recipientClaims
                           .slice(
                             (recipientCurrentPage - 1) * recipientClaimsPerPage,
                             recipientCurrentPage * recipientClaimsPerPage,
@@ -705,7 +784,7 @@ function AdminDashboard() {
                                 </span>
                               </td>
                             </tr>
-                          ))}
+                          ))} */}
                       </tbody>
                     </table>
                   </div>
@@ -713,23 +792,25 @@ function AdminDashboard() {
                   {/* Pagination fixed at bottom */}
                   <div className="flex justify-between items-center mt-4">
                     <button
-                      disabled={recipientCurrentPage === 1}
-                      onClick={() =>
-                        setRecipientCurrentPage((prev) => Math.max(prev - 1, 1))
+                      // disabled={recipientCurrentPage === 1}
+                      onClick={
+                        () => {}
+                        // setRecipientCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <span className="text-gray-600">
-                      Page {recipientCurrentPage} of {recipientTotalPages}
+                      {/* Page {recipientCurrentPage} of {recipientTotalPages} */}
                     </span>
                     <button
-                      disabled={recipientCurrentPage === recipientTotalPages}
-                      onClick={() =>
-                        setRecipientCurrentPage((prev) =>
-                          Math.min(prev + 1, recipientTotalPages),
-                        )
+                      // disabled={recipientCurrentPage === recipientTotalPages}
+                      onClick={
+                        () => {}
+                        // setRecipientCurrentPage((prev) =>
+                        //   Math.min(prev + 1, recipientTotalPages),
+                        // )
                       }
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
@@ -756,12 +837,15 @@ function AdminDashboard() {
       )}
 
       {/* Selected Donation Modal */}
-      {selectedDonation && (
+      {selectedDonation && detailDonation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="relative bg-white rounded-xl shadow-2xl p-8 w-3/4 h-[80vh] flex flex-col">
             {/* Close Button */}
             <button
-              onClick={() => setSelectedDonation(null)}
+              onClick={() => {
+                setSelectedDonation(null);
+                setDetailDonation(false);
+              }}
               className="absolute top-8 right-8 text-gray-600 hover:text-black font-bold text-xl"
             >
               ✕
@@ -797,25 +881,35 @@ function AdminDashboard() {
                   <div className="bg-purple-50 p-4 rounded-lg shadow-sm">
                     <p>
                       <span className="font-semibold">Item:</span>{" "}
-                      {selectedDonation.item}
+                      {selectedDonation.foodType}
                     </p>
                     <p>
                       <span className="font-semibold">Quantity:</span>{" "}
                       {selectedDonation.quantity}
                     </p>
                     <p>
+                      <span className="font-semibold">Pickup Address:</span>{" "}
+                      {selectedDonation.pickupAddress}
+                    </p>
+                    <p>
                       <span className="font-semibold">Status updated to</span>{" "}
                       {selectedDonation.status}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Expiry Date:</span>{" "}
+                      {selectedDonation.expiryDate === ""
+                        ? "--"
+                        : selectedDonation.expiryDate}
+                    </p>
+                    <p>
+                      <span className="font-semibold">
+                        Notes: {selectedDonation.notes}
+                      </span>{" "}
                     </p>
                     <p>
                       <span className="font-semibold">Donation created on</span>{" "}
                       {Date()}
                     </p>
-                    {/* <p>
-                      <span className="font-semibold">
-                        Status updated to {selectedDonation.status}
-                      </span>{" "}
-                    </p> */}
                   </div>
                 </div>
               )}
@@ -834,7 +928,7 @@ function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {recipientClaims
+                        {/* {recipientClaims
                           .filter(
                             (claim) => claim.donationId === selectedDonation.id,
                           )
@@ -858,7 +952,7 @@ function AdminDashboard() {
                                 </span>
                               </td>
                             </tr>
-                          ))}
+                          ))} */}
                       </tbody>
                     </table>
                   </div>
@@ -866,23 +960,25 @@ function AdminDashboard() {
                   {/* Pagination fixed at bottom */}
                   <div className="flex justify-between items-center mt-4">
                     <button
-                      disabled={claimsCurrentPage === 1}
-                      onClick={() =>
-                        setClaimsCurrentPage((prev) => Math.max(prev - 1, 1))
+                      // disabled={claimsCurrentPage === 1}
+                      onClick={
+                        () => {}
+                        // setClaimsCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <span className="text-gray-600">
-                      Page {claimsCurrentPage} of {claimsTotalPages}
+                      {/* Page {claimsCurrentPage} of {claimsTotalPages} */}
                     </span>
                     <button
-                      disabled={claimsCurrentPage === claimsTotalPages}
-                      onClick={() =>
-                        setClaimsCurrentPage((prev) =>
-                          Math.min(prev + 1, claimsTotalPages),
-                        )
+                      // disabled={claimsCurrentPage === claimsTotalPages}
+                      onClick={
+                        () => {}
+                        // setClaimsCurrentPage((prev) =>
+                        //   Math.min(prev + 1, claimsTotalPages),
+                        // )
                       }
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                     >
@@ -891,21 +987,30 @@ function AdminDashboard() {
                   </div>
                 </div>
               )}
-
-              {/* Activity Tab */}
-              {/* {donationTab === "activity" && (
-                <ul className="space-y-2">
-                  <li className="text-gray-700">
-                    Donation created on Jan 20, 2026
-                  </li>
-                  <li className="text-gray-700">
-                    Status updated to {selectedDonation.status}
-                  </li>
-                </ul>
-              )} */}
             </div>
           </div>
         </div>
+
+        // <DetailModal
+        //   donation={selectedDonation}
+        //   onClose={() => setDetailDonation(false)}
+        // />
+      )}
+
+      {selectedDonation && editDonation && (
+        <EditModal
+          donation={selectedDonation}
+          onClose={() => setEditDonation(false)}
+          onUpdate={handleUpdateDonation}
+        />
+      )}
+
+      {selectedDonation && deleteDonation && (
+        <DeleteModal
+          donation={selectedDonation}
+          onClose={() => setDeleteDonation(false)}
+          onConfirm={handleDeleteDonation}
+        />
       )}
     </div>
   );
