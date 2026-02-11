@@ -13,6 +13,15 @@ import { AuthenticatedRequest } from "../@types/authenticatedRequest";
 
 export async function CreateUser(request: Request, response: Response) {
   try {
+    const profileImageUrl: Express.Multer.File | undefined = request.file;
+    if (!profileImageUrl) {
+      return response.status(500).json({
+        status: false,
+        message: "Image not found.",
+      });
+    }
+    console.log(profileImageUrl.path);
+
     const { data, success, error } = userSchemaValidator.safeParse(
       request.body,
     );
@@ -35,6 +44,7 @@ export async function CreateUser(request: Request, response: Response) {
 
     const hashedPassword = await GenerateHash(data.password);
     data.password = hashedPassword;
+    data.profilePictureUrl = profileImageUrl.path;
 
     const newUser = await userModels.create(data);
 
@@ -303,7 +313,13 @@ export async function GetProfile(
   response: Response,
 ) {
   try {
-    const user = request.user;
+    const user = await userModels.findById(request.user.id);
+    if (!user) {
+      return response.status(404).json({
+        status: false,
+        message: "User not found.",
+      });
+    }
     return response.status(200).json({
       status: true,
       user: user,

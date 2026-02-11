@@ -11,4 +11,5 @@ export interface UserType extends Document {
   isDeleted: boolean;
   verificationToken?: string;
   resetCredentialsToken?: string;
+  profilePictureUrl?: string;
 }

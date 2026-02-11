@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema<UserType>(
     isDeleted: { type: Boolean, default: false },
     verificationToken: { type: String, default: null },
     resetCredentialsToken: { type: String, default: null },
+    profilePictureUrl: { type: String, default: null },
   },
   {
     timestamps: true,

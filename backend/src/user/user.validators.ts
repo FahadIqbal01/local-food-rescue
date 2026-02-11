@@ -23,6 +23,7 @@ export const userSchemaValidator = zod.object({
   isDeleted: zod.boolean().default(false),
   verificationToken: zod.string().default(""),
   resetCredentialsToken: zod.string().default(""),
+  profilePictureUrl: zod.string().default(""),
 });
 
 export const userSchemaUpdateValidator = userSchemaValidator.partial();

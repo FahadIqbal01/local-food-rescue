@@ -13,6 +13,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -24,6 +25,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
         .then((res) => {
           setUserName(res.data.user.name);
           setUserRole(res.data.user.role);
+          setProfilePicture(res.data.user.profilePictureUrl);
         })
         .catch((err) => {
           console.error("Error fetching profile:", err);
@@ -55,7 +57,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
           className="flex items-center space-x-2 focus:outline-none"
         >
           <img
-            src="/user.png" // placeholder avatar
+            src={profilePicture || "/user.png"} // placeholder avatar
             alt="User Avatar"
             className="w-10 h-10 rounded-full border-2 border-white"
           />

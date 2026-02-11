@@ -8,25 +8,32 @@ function Register() {
   const [role, setRole] = useState("donor");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Build request body according to backend schema
-    const requestBody = {
-      name,
-      email,
-      password,
-      role,
-      phoneNumber,
-      address,
-    };
+    if (!profilePicture) {
+      alert("Profile picture is required!");
+      return;
+    }
+
+    // Build FormData for multipart/form-data
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("role", role);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("address", address);
+    formData.append("profilePicture", profilePicture);
 
     // Later: send requestBody to backend API
     try {
       const response = await axios.post(
         "http://127.0.0.1:3001/api/user/post",
-        requestBody,
+        formData,
       );
       if (response.data.status) {
         alert("User created successfully!");
@@ -37,7 +44,15 @@ function Register() {
       console.error(error);
       alert("Something went wrong.");
     }
-  };
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicture(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  }
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -113,6 +128,24 @@ function Register() {
               <option value="recipient">Recipient</option>
               <option value="admin">Admin</option>
             </select>
+          </div>
+          {/* Profile Picture */}
+          <div className="col-span-2">
+            <label className="block text-gray-700 mb-2">Profile Picture</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-green-600"
+              required
+            />
+            {previewUrl && (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="mt-4 h-24 w-24 object-cover rounded-full border"
+              />
+            )}
           </div>
           <div className="col-span-2">
             <button

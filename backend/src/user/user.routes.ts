@@ -12,10 +12,11 @@ import {
 } from "./user.controllers";
 import { CheckJWT } from "../middlewares/checkJWToken";
 import { AuthorizeUser } from "../middlewares/authorizeUser";
+import upload from "../utils/multer";
 
 const userRouter = Router();
 
-userRouter.post("/post", CreateUser);
+userRouter.post("/post", upload.single("profilePicture"), CreateUser);
 userRouter.get("/get", CheckJWT, AuthorizeUser(["admin"]), GetAllUsers);
 userRouter.get("/get/data", CheckJWT, GetProfile);
 userRouter.get("/get/:id", GetUserById);

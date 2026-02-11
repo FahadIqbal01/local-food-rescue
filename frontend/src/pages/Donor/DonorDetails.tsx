@@ -20,6 +20,7 @@ interface Donor {
   phoneNumber?: string;
   address?: string;
   status: string;
+  profilePictureUrl?: string;
 }
 
 function DonorDetails() {
@@ -72,16 +73,23 @@ function DonorDetails() {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      {/* Header */}
-
-      {/* <Navbar colorClass="bg-purple-600" /> */}
-
       {/* Donor Info */}
-      <div className="bg-white shadow-lg rounded-xl p-6 mb-8 border border-gray-200">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          {donor.name}
-        </h2>
-        <div className="grid grid-cols-2 gap-4 text-gray-700">
+      <div className="bg-white shadow-lg rounded-xl p-6 mb-8 w-1/2 border border-gray-200 flex gap-6 items-start">
+        {/* Left: Profile Picture + Name */}
+        <div className="flex flex-col items-center w-1/3">
+          <div className="flex justify-start mb-4">
+            <img
+              src={donor.profilePictureUrl || "/user.png"}
+              alt={`${donor.name}'s profile`}
+              className="w-48 h-48 rounded-full object-cover border-2 border-gray-300"
+            />
+          </div>
+        </div>
+        {/* Right: User Information */}
+        <div className="flex-1 grid grid-cols-1 gap-4 w-2/3 text-gray-700 text-pretty">
+          <h2 className="text-2xl font-semibold text-gray-800 ">
+            {donor.name}
+          </h2>
           <p>
             <span className="font-medium">Email:</span> {donor.email}
           </p>
@@ -172,7 +180,6 @@ function DonorDetails() {
         >
           Back to Dashboard
         </button>
-        {/* <h1 className="text-2xl font-bold">Donor Details</h1> */}
       </div>
     </div>
   );
