@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import LoadingOverlay from "./LoadingOverlay";
 
 interface NavbarProps {
   role?: "donor" | "recipient" | "admin";
@@ -14,6 +15,8 @@ export default function Navbar({ colorClass }: NavbarProps) {
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -34,40 +37,44 @@ export default function Navbar({ colorClass }: NavbarProps) {
   }, []);
 
   function handleLogout() {
+    setLoading(true);
+
     localStorage.removeItem("authToken");
     localStorage.removeItem("donorID");
     localStorage.clear();
   }
   return (
-    <nav
-      className={`w-full ${colorClass} text-white px-6 py-3 flex justify-between items-center`}
-    >
-      {/* Left: Logo */}
-      <div className="text-xl font-bold">
-        <Link to="/">
-          Food Rescue - Welcome to{" "}
-          {userRole && userRole?.charAt(0).toUpperCase() + userRole?.slice(1)}
-        </Link>
-      </div>
+    <>
+      {loading && <LoadingOverlay message="Logging out..." />}
+      <nav
+        className={`w-full ${colorClass} text-white px-6 py-3 flex justify-between items-center`}
+      >
+        {/* Left: Logo */}
+        <div className="text-xl font-bold">
+          <Link to="/">
+            Food Rescue - Welcome to{" "}
+            {userRole && userRole?.charAt(0).toUpperCase() + userRole?.slice(1)}
+          </Link>
+        </div>
 
-      {/* Right: Avatar Dropdown */}
-      <div className="relative">
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center space-x-2 focus:outline-none"
-        >
-          <img
-            src={profilePicture || "/user.png"} // placeholder avatar
-            alt="User Avatar"
-            className="w-10 h-10 rounded-full border-2 border-white"
-          />
-          <span className="hidden md:inline font-semibold">{userName}</span>
-        </button>
+        {/* Right: Avatar Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex items-center space-x-2 focus:outline-none"
+          >
+            <img
+              src={profilePicture || "/user.png"} // placeholder avatar
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full border-2 border-white"
+            />
+            <span className="hidden md:inline font-semibold">{userName}</span>
+          </button>
 
-        {menuOpen && (
-          <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-lg">
-            {/* Role-specific links */}
-            {/* {role === "donor" && (
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-lg">
+              {/* Role-specific links */}
+              {/* {role === "donor" && (
               <Link
                 to="/donor-dashboard"
                 className="block px-4 py-2 hover:bg-purple-100"
@@ -76,7 +83,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
                 My Donations
               </Link>
             )} */}
-            {/* {role === "recipient" && (
+              {/* {role === "recipient" && (
               <Link
                 to="/recipient-dashboard"
                 className="block px-4 py-2 hover:bg-purple-100"
@@ -85,7 +92,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
                 My Claims
               </Link>
             )} */}
-            {/* {userRole === "admin" && (
+              {/* {userRole === "admin" && (
               <>
                 <Link
                   to="/admin-dashboard/donors"
@@ -111,35 +118,39 @@ export default function Navbar({ colorClass }: NavbarProps) {
               </>
             )} */}
 
-            {/* Common links */}
-            {/* <Link
+              {/* Common links */}
+              {/* <Link
               to="/analytics"
               className="block px-4 py-2 hover:bg-purple-100"
               onClick={() => setMenuOpen(false)}
             >
               Impact Analytics
             </Link> */}
-            {/* <Link
+              {/* <Link
               to="/profile"
               className="block px-4 py-2 hover:bg-purple-100"
               onClick={() => setMenuOpen(false)}
             >
               Profile / Settings
             </Link> */}
-            <button
-              className="w-full text-left px-4 py-2 hover:bg-purple-100"
-              onClick={() => {
-                setMenuOpen(false);
-                handleLogout();
-                // handle logout logic here
-                navigate("/login");
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
-    </nav>
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-purple-100"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLogout();
+                  // handle logout logic here
+                  setTimeout(() => {
+                    setLoading(false);
+                    navigate("/login");
+                  }, 3000);
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </nav>
+    </>
   );
 }

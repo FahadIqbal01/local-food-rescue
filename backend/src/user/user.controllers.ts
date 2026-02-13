@@ -20,7 +20,6 @@ export async function CreateUser(request: Request, response: Response) {
         message: "Image not found.",
       });
     }
-    console.log(profileImageUrl.path);
 
     const { data, success, error } = userSchemaValidator.safeParse(
       request.body,
@@ -28,8 +27,7 @@ export async function CreateUser(request: Request, response: Response) {
     if (!success) {
       return response.status(400).json({
         status: false,
-        message: "In zod validation",
-        errorMessage: error.issues.map((issue) => issue.message),
+        message: error.issues.map((issue) => issue.message),
       });
     }
 
@@ -63,6 +61,7 @@ export async function CreateUser(request: Request, response: Response) {
       VerificationEmail(newUser.name, newUser.role, verificationLink),
     );
 
+    console.log("User created");
     return response.status(200).json({
       status: true,
       message: "User created.",

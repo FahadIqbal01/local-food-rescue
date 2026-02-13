@@ -107,6 +107,7 @@ export async function GetDonationsForRecipients(
         status: "available",
       }),
       claimed: await donationModels.countDocuments({
+        recipientID: request.query.userID,
         status: "completed",
       }),
     });

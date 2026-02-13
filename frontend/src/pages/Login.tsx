@@ -1,14 +1,21 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import LoadingOverlay from "../components/Global/LoadingOverlay";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    setLoading(true);
+    setErrorMessage("");
 
     const loginRequestBody = {
       email,
@@ -41,77 +48,85 @@ function Login() {
         } else {
           navigate("/");
         }
-
-        alert("User logged in successfully.");
-      } else {
-        alert("Error: " + response.data.message);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong.");
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-green-700 mb-6">
-          Login to Food Rescue
-        </h2>
+    <>
+      {/* Global Loading Overlay */}
+      {loading && <LoadingOverlay message="Logging you in..." />}
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
+          <h2 className="text-3xl font-bold text-center text-green-700 mb-6">
+            Login to Food Rescue
+          </h2>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Email */}
-          <div>
-            <label className="block text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
-            />
-          </div>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email */}
+            <div>
+              <label className="block text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
+                required
+              />
+            </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-gray-700 mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
-            />
-          </div>
+            {/* Password */}
+            <div>
+              <label className="block text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2`}
+                required
+              />
+            </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-          >
-            Login
-          </button>
-        </form>
+            {errorMessage && (
+              <p className="text-red-600 text-sm">{errorMessage}</p>
+            )}
 
-        {/* Links */}
-        <div className="text-center mt-4">
-          <p className="text-gray-600">
-            Don’t have an account?{" "}
-            <a href="/register" className="text-green-700 hover:underline">
-              Register
-            </a>
-          </p>
-          <p className="mt-2">
+            {/* Submit Button */}
             <button
-              onClick={() => navigate("forgot-password")}
-              className="text-sm text-blue-600 hover:underline"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition disabled:opacity-50"
             >
-              Forgot password?
+              {loading ? "Logging in..." : "Login"}
             </button>
-          </p>
+          </form>
+
+          {/* Links */}
+          <div className="text-center mt-4">
+            <p className="text-gray-600">
+              Don’t have an account?{" "}
+              <a href="/register" className="text-green-700 hover:underline">
+                Register
+              </a>
+            </p>
+            <p className="mt-2">
+              <button
+                onClick={() => navigate("forgot-password")}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot password?
+              </button>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
