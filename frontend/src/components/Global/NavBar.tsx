@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoadingOverlay from "./LoadingOverlay";
+import process from "process";
 
 interface NavbarProps {
   role?: "donor" | "recipient" | "admin";
@@ -22,12 +23,9 @@ export default function Navbar({ colorClass }: NavbarProps) {
     const token = localStorage.getItem("authToken");
     if (token) {
       axios
-        .get(
-          "http://local-food-rescue-production.up.railway.app/api/user/get/data",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        )
+        .get(`${process.env.REACT_APP_API_URL}/api/user/get/data`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => {
           setUserName(res.data.user.name);
           setUserRole(res.data.user.role);

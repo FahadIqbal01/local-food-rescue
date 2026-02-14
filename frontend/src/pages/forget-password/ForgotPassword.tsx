@@ -8,12 +8,9 @@ function ForgotPassword() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     // Later: call backend API here
-    axios.post(
-      "http://local-food-rescue-production.up.railway.app/api/forgot/verifyUser",
-      {
-        email,
-      },
-    );
+    axios.post(`${process.env.REACT_APP_API_URL}/api/forgot/verifyUser`, {
+      email,
+    });
     // setMessage("If this email exists, a reset link has been sent.");
   }
 

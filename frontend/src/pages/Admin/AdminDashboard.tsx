@@ -78,7 +78,7 @@ function AdminDashboard() {
       const token = localStorage.getItem("authToken");
       try {
         const stats = await axios.get(
-          "http://local-food-rescue-production.up.railway.app/api/admin/get/stats",
+          `${process.env.REACT_APP_API_URL}/api/admin/get/stats`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -90,7 +90,7 @@ function AdminDashboard() {
 
         if (activeTab === "donations") {
           const response = await axios.get(
-            "http://local-food-rescue-production.up.railway.app/api/admin/get/donation",
+            `${process.env.REACT_APP_API_URL}/api/admin/get/donation`,
             {
               params: { limit, page },
               headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +104,7 @@ function AdminDashboard() {
           }
         } else if (activeTab === "donors") {
           const allDonors = await axios.get(
-            "http://local-food-rescue-production.up.railway.app/api/admin/get/donors",
+            `${process.env.REACT_APP_API_URL}/api/admin/get/donors`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -116,7 +116,7 @@ function AdminDashboard() {
           }
         } else if (activeTab === "recipients") {
           const recipients = await axios.get(
-            "http://local-food-rescue-production.up.railway.app/api/admin/get/recipients",
+            `${process.env.REACT_APP_API_URL}/api/admin/get/recipients`,
             {
               params: {
                 limit,
@@ -151,7 +151,7 @@ function AdminDashboard() {
   async function handleDeleteDonation(id: string) {
     try {
       await axios.delete(
-        `http://local-food-rescue-production.up.railway.app/api/donation/delete/${id}`,
+        `${process.env.REACT_APP_API_URL}/api/donation/delete/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,

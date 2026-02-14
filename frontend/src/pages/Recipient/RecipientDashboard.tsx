@@ -48,7 +48,7 @@ function RecipientDashboard() {
       const userID = localStorage.getItem("donorID");
 
       const response = await axios.get(
-        "http://local-food-rescue-production.up.railway.app/api/donation/get/forRecipient",
+        `${process.env.REACT_APP_API_URL}/api/donation/get/forRecipient`,
         {
           params: { page, limit, userID },
           headers: { Authorization: `Bearer ${token}` },
@@ -80,7 +80,7 @@ function RecipientDashboard() {
     const token = localStorage.getItem("authToken");
     await axios
       .patch(
-        "http://local-food-rescue-production.up.railway.app/api/recipient/claim",
+        `${process.env.REACT_APP_API_URL}/api/recipient/claim`,
         {},
         {
           params: { donationID: selectedDonation?._id },
@@ -104,7 +104,7 @@ function RecipientDashboard() {
 
     try {
       const response = await axios.get(
-        "http://local-food-rescue-production.up.railway.app/api/donation/get/claims",
+        `${process.env.REACT_APP_API_URL}/api/donation/get/claims`,
         {
           params: { userID },
           headers: { Authorization: `Bearer ${token}` },

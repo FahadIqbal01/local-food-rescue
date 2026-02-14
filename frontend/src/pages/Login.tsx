@@ -29,7 +29,7 @@ function Login() {
     };
     try {
       const response = await axios.post(
-        "http://local-food-rescue-production.up.railway.app/api/user/login",
+        `${process.env.REACT_APP_API_URL}/api/user/login`,
         loginRequestBody,
       );
 
