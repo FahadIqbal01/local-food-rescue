@@ -7,6 +7,8 @@ import allApiRouter from "./routes/allApisRouter";
 import { ConnectDatabase } from "./database/databaseHandler";
 import logger from "./middlewares/logger";
 
+import "./jobs/AutoDeleteDonations";
+
 const app = express();
 
 app.use(logger);

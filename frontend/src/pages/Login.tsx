@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingOverlay from "../components/Global/LoadingOverlay";
+import Notification from "../components/Global/Notifications";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,11 @@ function Login() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const [showNotification, setShowNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,30 +41,41 @@ function Login() {
         // Save token for later requests
         localStorage.setItem("authToken", token);
         localStorage.setItem("donorID", response.data.user.id);
-        console.log(localStorage.getItem("authToken"));
-        console.log(localStorage.getItem("donorID"));
+        console.log(localStorage);
 
-        // Redirect based on role
-        if (role === "donor") {
-          navigate("/donor");
-        } else if (role === "recipient") {
-          navigate("/recipient");
-        } else if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+        setShowNotification({ message: "Login Successful", type: "success" });
+
+        setTimeout(() => {
+          // Redirect based on role
+          if (role === "donor") {
+            navigate("/donor");
+          } else if (role === "recipient") {
+            navigate("/recipient");
+          } else if (role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+          setLoading(false);
+        }, 1000);
       }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message);
-    } finally {
-      setLoading(false);
     }
+    // finally {
+    //   setLoading(false);
+    // }
   }
 
   return (
     <>
       {/* Global Loading Overlay */}
+      {showNotification && (
+        <Notification
+          message={showNotification.message}
+          type={showNotification.type}
+        />
+      )}
       {loading && <LoadingOverlay message="Logging you in..." />}
       <div className="flex justify-center items-center h-screen bg-gray-100">
         <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">

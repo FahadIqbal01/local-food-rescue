@@ -7,6 +7,7 @@ import DetailModal from "../../modals/DetailModal";
 import EditModal from "../../modals/EditModal";
 import DeleteModal from "../../modals/DeleteModal";
 import LoadingOverlay from "../../components/Global/LoadingOverlay";
+import Notification from "../../components/Global/Notifications";
 
 type FormData = {
   foodType: string;
@@ -68,6 +69,12 @@ function DonorDashboard() {
   const [submitDonation, setSubmitDonation] = useState<boolean>(false);
   const [fetchingHistory, setFetchingHistory] = useState<boolean>(false);
   const [deleteDonation, setDeleteDonation] = useState<boolean>(false);
+
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+    onClose?: any;
+  } | null>(null);
 
   async function fetchDonations() {
     setLoading(true);
@@ -159,11 +166,18 @@ function DonorDashboard() {
         });
         fetchDonations();
         setShowAddDonation(false);
+        setNotification({
+          message: "Successfully donation added.",
+          type: "success",
+        });
       }
     } catch (error) {
       console.error("Error submitting donation:", error);
     } finally {
       setSubmitDonation(false);
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
     }
   }
 
@@ -249,6 +263,9 @@ function DonorDashboard() {
 
   return (
     <>
+      {notification && (
+        <Notification message={notification.message} type={notification.type} />
+      )}
       {deleteDonation && <LoadingOverlay message="Deleting donation..." />}
       {fetchingHistory && <LoadingOverlay message="Fetching history..." />}
       {submitDonation && <LoadingOverlay message="Submitting donation..." />}
