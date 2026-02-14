@@ -52,7 +52,7 @@ export async function CreateUser(request: Request, response: Response) {
       role: newUser.role,
     };
     const verificationToken: string = GenerateToken(payload);
-    const verificationLink: string = `http://localhost:3000/verify?token=${verificationToken}`;
+    const verificationLink: string = `${process.env.REACT_APP_API_URL}/verify?token=${verificationToken}`;
 
     await SendVerificationEmail(
       "fahadiqbal9318@gmail.com",

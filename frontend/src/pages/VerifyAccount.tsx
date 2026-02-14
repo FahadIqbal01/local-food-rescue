@@ -13,7 +13,7 @@ function VerifyAccount() {
     if (token) {
       axios
         .post(
-          "http://localhost:3001/api/user/verify",
+          `${process.env.REACT_APP_API_URL}:3001/api/user/verify`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
