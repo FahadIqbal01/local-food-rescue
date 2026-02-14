@@ -41,7 +41,7 @@ function RecipientDetails() {
       try {
         // Fetch recipient info
         const donorRes = await axios.get(
-          `http://127.0.0.1:3001/api/admin/recipients/${id}`,
+          `http://local-food-rescue.railway.internal/api/admin/recipients/${id}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (donorRes.data.status) {
@@ -50,7 +50,7 @@ function RecipientDetails() {
 
         // Fetch recipient's claims
         const donationsRes = await axios.get(
-          `http://127.0.0.1:3001/api/admin/recipients/${id}/claims`,
+          `http://local-food-rescue.railway.internal/api/admin/recipients/${id}/claims`,
           {
             params: { page, limit },
             headers: { Authorization: `Bearer ${token}` },

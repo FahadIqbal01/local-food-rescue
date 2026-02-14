@@ -22,7 +22,7 @@ export default function Navbar({ colorClass }: NavbarProps) {
     const token = localStorage.getItem("authToken");
     if (token) {
       axios
-        .get("http://127.0.0.1:3001/api/user/get/data", {
+        .get("http://local-food-rescue.railway.internal/api/user/get/data", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {

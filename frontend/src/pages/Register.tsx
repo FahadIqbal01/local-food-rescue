@@ -38,7 +38,7 @@ function Register() {
     // Later: send requestBody to backend API
     try {
       const response = await axios.post(
-        "http://127.0.0.1:3001/api/user/post",
+        "http://local-food-rescue.railway.internal/api/user/post",
         formData,
       );
       if (response.data.status) {
