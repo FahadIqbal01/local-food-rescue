@@ -68,10 +68,10 @@ export async function CreateUser(request: Request, response: Response) {
       data: newUser,
       token: verificationToken,
     });
-  } catch (err) {
+  } catch (err: any) {
     return response.status(400).json({
       status: false,
-      message: err,
+      message: err.message,
     });
   }
 }
