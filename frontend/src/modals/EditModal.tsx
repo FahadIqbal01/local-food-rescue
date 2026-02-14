@@ -22,7 +22,7 @@ function EditModal({ donation, onClose, onUpdate }: any) {
     console.log("For Update:\n", formData);
     try {
       const res = await axios.patch(
-        `http://local-food-rescue.railway.internal/api/donation/update/${donation._id}`,
+        `http://local-food-rescue-production.up.railway.app/api/donation/update/${donation._id}`,
         {
           ...formData,
           quantity: parseInt(formData.quantity as unknown as string),

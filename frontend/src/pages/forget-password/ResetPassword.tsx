@@ -22,7 +22,7 @@ function ResetPassword() {
 
     try {
       const response = await axios.patch(
-        "http://local-food-rescue.railway.internal/api/forgot/reset",
+        "http://local-food-rescue-production.up.railway.app/api/forgot/reset",
         { token, newPassword },
       );
 

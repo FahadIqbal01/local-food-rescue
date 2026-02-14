@@ -9,7 +9,7 @@ function ForgotPassword() {
     e.preventDefault();
     // Later: call backend API here
     axios.post(
-      "http://local-food-rescue.railway.internal/api/forgot/verifyUser",
+      "http://local-food-rescue-production.up.railway.app/api/forgot/verifyUser",
       {
         email,
       },

@@ -84,7 +84,7 @@ function DonorDashboard() {
 
       if (donorID && token) {
         const response = await axios.get(
-          "http://local-food-rescue.railway.internal/api/donation/get",
+          "http://local-food-rescue-production.up.railway.app/api/donation/get",
           {
             params: {
               donorID,
@@ -137,7 +137,7 @@ function DonorDashboard() {
 
     try {
       const response = await axios.post(
-        "http://local-food-rescue.railway.internal/api/donation/post",
+        "http://local-food-rescue-production.up.railway.app/api/donation/post",
         {
           ...formData,
           quantity: parseInt(formData.quantity as unknown as string),
@@ -209,7 +209,7 @@ function DonorDashboard() {
     setDeleteDonation(true);
     try {
       const response = await axios.delete(
-        `http://local-food-rescue.railway.internal/api/donation/delete/${id}`,
+        `http://local-food-rescue-production.up.railway.app/api/donation/delete/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -236,7 +236,7 @@ function DonorDashboard() {
 
       if (donorID && token) {
         const response = await axios.get(
-          "http://local-food-rescue.railway.internal/api/donation/history",
+          "http://local-food-rescue-production.up.railway.app/api/donation/history",
           {
             params: {
               donorID,

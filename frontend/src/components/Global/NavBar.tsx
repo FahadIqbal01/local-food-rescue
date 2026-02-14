@@ -22,9 +22,12 @@ export default function Navbar({ colorClass }: NavbarProps) {
     const token = localStorage.getItem("authToken");
     if (token) {
       axios
-        .get("http://local-food-rescue.railway.internal/api/user/get/data", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          "http://local-food-rescue-production.up.railway.app/api/user/get/data",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        )
         .then((res) => {
           setUserName(res.data.user.name);
           setUserRole(res.data.user.role);
