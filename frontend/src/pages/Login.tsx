@@ -28,6 +28,7 @@ function Login() {
       password,
     };
     try {
+      console.log("URL: ", process.env.REACT_APP_API_URL);
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/user/login`,
         loginRequestBody,
