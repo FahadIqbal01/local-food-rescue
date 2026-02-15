@@ -9,12 +9,18 @@ export async function SendVerificationEmail(
   try {
     // Create a transporter object.
     const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // true for 465, false for 587
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
+
+    console.log(process.env.EMAIL_USER);
+    console.log(process.env.EMAIL_PASS);
 
     //   Define email options
     const mailOptions = {
@@ -25,10 +31,13 @@ export async function SendVerificationEmail(
       html: html,
     };
 
+    await transporter.verify();
+    console.log("SMTP server is ready to take messages");
+
     const emailPromise = await transporter.sendMail(mailOptions);
     console.log("Email sent: ", emailPromise.response);
-  } catch (error) {
-    console.error("Error in sending email: ", error);
+  } catch (error: any) {
+    console.error("Error in sending email: ", error.message);
   }
 }
 
